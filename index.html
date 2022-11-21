@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- icons cdn -->
+    <script src="https://kit.fontawesome.com/3616505ddd.js" crossorigin="anonymous"></script>
+    
+
+    <!-- google font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+
+    <!-- style sheet -->
+    <link rel="stylesheet" href="style.css">
+
+    <title>Document</title>
+</head>
+
+<body>
+
+    <div class="main">
+
+        <div class="drops">
+
+        </div>
+
+        <div class="nav-bar container">
+            <h3 id="logo">Brightgoal</h3>
+            <div class="menu">
+                <button><i class="fa-solid fa-plus"></i></button>
+            </div>
+        </div>
+
+        <div class="player">
+            <div class="play">
+                <div class="player-menu">
+                    <div class="player-menu-optins">
+                        <a href="#" name="volumeOn" id="volume-icon"><i class="fa-solid fa-volume-high"></i></a>
+                        <a href="#" name="volumeOff" id="volume-icon" class="hide"><i class="fa-solid fa-volume-xmark"></i></a>
+                        <input id="volume-controller" type="range" min="1" max="100" value="50">
+                    </div>
+
+                    <a class="player-menu-optins" href=""><i class="fa-solid fa-gear"></i></a>
+                </div>
+                <div class="song-info">
+                    <div class="cd-player">
+                        <div class="cd">
+                            <div class="cd-inner"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="status-bar">
+                    <div class="slider">
+                        <p id="song-current-time">01:45</p>
+                        <input class="time-slider" id="time-slider" type="range" min="1" max="100" value="50">
+                        <p id="song-duration">00:25</p>
+                    </div>
+                    <div class="controls">
+                        <a href="#" id="button-repeat"><i class="fa-solid fa-repeat"></i></a>
+                        <a href="#" id="button-previous"><i class="fa-solid fa-backward"></i></a>
+                        <a href="#" id="button-play"><i class="fa-solid fa-play"></i></a>
+                        <a href="#" id="button-next"><i class="fa-solid fa-forward"></i></a>
+                        <a href="#" id="button-shuffle"><i class="fa-solid fa-shuffle"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="song-list">
+                <div class="list-container">
+
+                </div>
+            </div>
+        </div>
+
+        <footer>Brightgoal <i class="fa-solid fa-heart"></i> 2022</footer>
+    </div>
+
+    <!-- Java Script -->
+    <script src="main.js"></script>
+</body>
+
+</html>
