@@ -59,7 +59,7 @@ a {
     backdrop-filter: blur(2rem);
 }
 
-.nav-bar .menu button{
+.nav-bar .menu .button{
     background-color: var(--primary-2);
     color: white;
     font-size: 1.1rem;
@@ -69,11 +69,26 @@ a {
     border-radius: 4px;
     background: radial-gradient(#0072ff, #0000e7);
     cursor: pointer;
+    text-align: center;
 }
 
-.nav-bar .menu button:active {
+.nav-bar .menu .button:active {
     transform: scale(0.98);
     background: radial-gradient(#0000e7, #0072ff);
+}
+
+.nav-bar .menu input{
+    display: none;
+}
+
+.nav-bar .menu label{
+    display: inline-block; 
+    position: relative;
+}
+
+.nav-bar .menu label i{
+    display: inline-block;
+    transform: translateY(15%);
 }
 
 /* player */

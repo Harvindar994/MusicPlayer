@@ -1,3 +1,4 @@
+var jsmediatags = window.jsmediatags;
 var drops_container = document.querySelector(".drops");
 
 function getRandomInt(start, end) {
@@ -287,21 +288,12 @@ var buttonShuffle = document.querySelector("#button-shuffle");
 var timeSlider = document.querySelector("#time-slider");
 var songCurrentTime = document.querySelector("#song-current-time");
 var songDuration = document.querySelector("#song-duration");
-// Code for moving disk.
-// var cd_disk = document.querySelector(".cd");
+var buttonBrowseFile = document.querySelector("#browse-file");
 
-// var rotate = 0;
-
-// var timeInterval = setInterval(() => {
-//     rotate++;
-//     if(rotate > 360){
-//         rotate = 0;
-//     }
-//     cd_disk.style.transform = `translate(50%, -50%) rotate(${rotate}deg)`;
-// }, 20);
 
 // Audio player start from here.
-var audioPlayer = function(timeSlider, playButton, pauseButton, nextButton, previousButton, shuffleButton, repeatButton, currentTime, duration){
+var audioPlayer = function(browseFileButton, timeSlider, playButton, pauseButton, nextButton, previousButton, shuffleButton, repeatButton, currentTime, duration){
+    this.buttonBrowseFile = browseFileButton;
     this.timeSlider = timeSlider;
     this.playButton = playButton;
     this.pauseButton = pauseButton;
@@ -322,7 +314,7 @@ var audioPlayer = function(timeSlider, playButton, pauseButton, nextButton, prev
     this.currentTimeSliderUnit = 0;
 
     // state holding variables.
-    this.isPlaying = true;
+    this.isPlaying = false;
     this.isRepeatActive = false;
     this.isShuffleActive = false;
     this.volume = 1;
@@ -362,6 +354,7 @@ var audioPlayer = function(timeSlider, playButton, pauseButton, nextButton, prev
         this.nextButton.addEventListener("click", this.next);
         this.repeatButton.addEventListener("click", this.onRepeatChnage);
         this.shuffleButton.addEventListener("click", this.onShuffleActive);
+        this.buttonBrowseFile.addEventListener("change", this.browseFile);
 
         this.timeSlider.addEventListener("mouseup", this.onTimeChnage);
         this.timeSlider.addEventListener("mousedown", this.onTimeSliderActive);
@@ -377,6 +370,64 @@ var audioPlayer = function(timeSlider, playButton, pauseButton, nextButton, prev
         this.listHandler.add("audio/18 Saal - Deep Dosanjh 128 Kbps.mp3", "sdfhsfsdfsd", "Harvindar Singh", "01:04:44", "images/park.png", true);
         this.listHandler.add("audio/10 Bande - George Sidhu 128 Kbps.mp3", "sdfhsfsdfsd", "Harvindar Singh", "01:04:44", "images/park.png", true);
 
+    }
+
+    this.addFile = function(tag){
+        // Array buffer to base64
+        const data = tag.tags.picture.data;
+        const format = tag.tags.picture.format;
+        let base64String = "";
+        for (let i = 0; i < data.length; i++) {
+            base64String += String.fromCharCode(data[i]);
+        }
+
+        // Output media tags
+        let imageUrl = `url(data:${format};base64,${window.btoa(base64String)})`;
+        
+        let title =  tag.tags.title;
+        let artist = tag.tags.artist;
+        let album = tag.tags.album;
+        let genre = tag.tags.genre;
+        
+        console.log(`title: ${title}, artist: ${artist}, album: ${album}, genre: ${genre}`);
+
+
+    }
+
+    this.browseFile = (event) => {
+        for(let index=0; index<event.currentTarget.files.length; index++){
+
+            let file = event.currentTarget.files[index];
+
+            var fileObject = {
+                filePath: "none",
+                title: null,
+                artist: null,
+                coverImage: null,
+                duration: ""
+            };
+    
+            jsmediatags.read(file, { onSuccess: function(tag){
+                // Array buffer to base64
+                const data = tag.tags.picture.data;
+                const format = tag.tags.picture.format;
+                let base64String = "";
+                for (let i = 0; i < data.length; i++) {
+                    base64String += String.fromCharCode(data[i]);
+                }
+
+                // Output media tags
+                this.fileObj.coverImage = `url(data:${format};base64,${window.btoa(base64String)})`;
+                
+                this.fileObj.title =  tag.tags.title;
+                this.fileObj.artist = tag.tags.artist;
+                // tag.tags.album;
+                // tag.tags.genre;
+            },
+            fileObj: fileObject});
+
+            console.log(fileObject);
+        }
     }
 
     this.onTimeSliderActive = () => {
@@ -519,5 +570,37 @@ var audioPlayer = function(timeSlider, playButton, pauseButton, nextButton, prev
     this.__init__();
 }
 
-var audio_player = new audioPlayer(timeSlider, buttonPlay, buttonPause, buttonNext, buttonPrevious, buttonShuffle, buttonRepeat, songCurrentTime, songDuration);
+var audio_player = new audioPlayer(buttonBrowseFile, timeSlider, buttonPlay, buttonPause, buttonNext, buttonPrevious, buttonShuffle, buttonRepeat, songCurrentTime, songDuration);
 audio_player.listHandler.selectByIndex(1);
+
+
+// const jsmediatags = window.jsmediatags;
+
+// document.querySelector("#input").addEventListener("change", (event) => {
+  
+//   const file = event.target.files[0];
+
+//   jsmediatags.read(file, {
+//     onSuccess: function(tag) { 
+
+//       // Array buffer to base64
+//       const data = tag.tags.picture.data;
+//       const format = tag.tags.picture.format;
+//       let base64String = "";
+//       for (let i = 0; i < data.length; i++) {
+//         base64String += String.fromCharCode(data[i]);
+//       }
+
+//       // Output media tags
+//       document.querySelector("#cover").style.backgroundImage = `url(data:${format};base64,${window.btoa(base64String)})`;
+      
+//       document.querySelector("#title").textContent = tag.tags.title;
+//       document.querySelector("#artist").textContent = tag.tags.artist;
+//       document.querySelector("#album").textContent = tag.tags.album;
+//       document.querySelector("#genre").textContent = tag.tags.genre;
+//       },
+//       onError: function(error) {
+//         console.log(error);
+//       }
+//   });  
+// });
