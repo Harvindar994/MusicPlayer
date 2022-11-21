@@ -242,17 +242,20 @@ a {
 .active-controller-button{
     color: var(--primary-2) !important;
 }
+.active-controller-button:hover{
+    color: white !important;
+}
 
 .status-bar a:nth-child(2){
     width: 50px;
     height: 50px;
     font-size: 1.2rem;
 }
-.status-bar a:nth-child(3){
+.status-bar a:nth-child(3), a:nth-child(4){
     width: 70px;
     height: 70px;
 }
-.status-bar a:nth-child(4){
+.status-bar a:nth-child(5){
     width: 50px;
     height: 50px;
     font-size: 1.2rem;
@@ -263,7 +266,7 @@ a {
     font-size: 1.2rem;
     color: gray;
 }
-.status-bar a:nth-child(5){
+.status-bar a:nth-child(6){
     width: 40px;
     height: 40px;
     font-size: 1.1rem;
