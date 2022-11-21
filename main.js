@@ -304,6 +304,7 @@ var audioPlayer = function(browseFileButton, timeSlider, playButton, pauseButton
     this.songCurrentTime = currentTime;
     this.songDuration = duration;
     this.cd_disk = document.querySelector(".cd");
+    this.cdPlayer = document.querySelector(".cd-player");
     this.rotate = 0;
 
     // audio related objects.
@@ -372,39 +373,26 @@ var audioPlayer = function(browseFileButton, timeSlider, playButton, pauseButton
 
     }
 
-    this.addFile = function(tag){
-        // Array buffer to base64
-        const data = tag.tags.picture.data;
-        const format = tag.tags.picture.format;
-        let base64String = "";
-        for (let i = 0; i < data.length; i++) {
-            base64String += String.fromCharCode(data[i]);
-        }
-
-        // Output media tags
-        let imageUrl = `url(data:${format};base64,${window.btoa(base64String)})`;
+    this.addFile = (fileObject) => {
         
-        let title =  tag.tags.title;
-        let artist = tag.tags.artist;
-        let album = tag.tags.album;
-        let genre = tag.tags.genre;
-        
-        console.log(`title: ${title}, artist: ${artist}, album: ${album}, genre: ${genre}`);
-
-
+        this.listHandler.add(fileObject.filePath, fileObject.title, fileObject.artist, fileObject.duration, fileObject.coverImage, false);
     }
 
     this.browseFile = (event) => {
+
+        var audio = new Audio();
+
         for(let index=0; index<event.currentTarget.files.length; index++){
 
             let file = event.currentTarget.files[index];
 
-            var fileObject = {
-                filePath: "none",
+            let fileObject = {
+                filePath: URL.createObjectURL(file),
                 title: null,
                 artist: null,
                 coverImage: null,
-                duration: ""
+                duration: "00:00",
+                addFile: this.addFile,
             };
     
             jsmediatags.read(file, { onSuccess: function(tag){
@@ -417,16 +405,16 @@ var audioPlayer = function(browseFileButton, timeSlider, playButton, pauseButton
                 }
 
                 // Output media tags
-                this.fileObj.coverImage = `url(data:${format};base64,${window.btoa(base64String)})`;
+                this.fileObj.coverImage = `data:${format};base64,${window.btoa(base64String)}`;
                 
                 this.fileObj.title =  tag.tags.title;
                 this.fileObj.artist = tag.tags.artist;
+
+                this.fileObj.addFile(this.fileObj);
                 // tag.tags.album;
                 // tag.tags.genre;
             },
             fileObj: fileObject});
-
-            console.log(fileObject);
         }
     }
 
@@ -435,11 +423,14 @@ var audioPlayer = function(browseFileButton, timeSlider, playButton, pauseButton
     }
 
     this.onMetaDataLoad = () => {
-        this.currentSong.currentTime = 1;
+        this.currentSong.currentTime = 0;
         this.currentTimeSliderUnit = this.currentSong.duration / 100;
 
         var duration = this.convertHMS(this.currentSong.duration);
         this.songDuration.innerText = `${duration[0]>0 ? duration[0] + ":" : ""}${duration[1]>9 ? duration[1] : "0"+duration[1]}:${duration[2]>9 ? duration[2] : "0"+duration[2]}`;
+
+        this.timeSlider.value = 0;
+        this.songCurrentTime.innerText = "00:00"
     }
 
     this.convertHMS = function(seconds){
@@ -457,6 +448,8 @@ var audioPlayer = function(browseFileButton, timeSlider, playButton, pauseButton
     }
 
     this.onSongChnage = (song_element) => {
+        this.cdPlayer.style.backgroundImage = `url(${song_element.image})`;
+
         this.currentSongElement = song_element;
         this.currentSong.src = this.currentSongElement.songFile;
         this.currentSong.load();

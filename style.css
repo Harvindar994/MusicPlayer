@@ -165,7 +165,7 @@ a {
     align-items: center;
     background-image: url("images/disc.png");
     background-size: 100%;
-    mix-blend-mode: multiply;
+    mix-blend-mode: hue;
     box-shadow: 0px 0px 65px 14px rgba(2, 117, 138, 0.527);
 }
 
