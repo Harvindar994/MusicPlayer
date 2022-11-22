@@ -368,14 +368,20 @@ var audioPlayer = function(browseFileButton, timeSlider, playButton, pauseButton
         this.volumeController.setVolume(this.volume / 0.01);
 
         // for testing.
-        this.listHandler.add("audio/18 Saal - Deep Dosanjh 128 Kbps.mp3", "sdfhsfsdfsd", "Harvindar Singh", "01:04:44", "images/park.png", true);
-        this.listHandler.add("audio/10 Bande - George Sidhu 128 Kbps.mp3", "sdfhsfsdfsd", "Harvindar Singh", "01:04:44", "images/park.png", true);
+        // this.listHandler.add("audio/18 Saal - Deep Dosanjh 128 Kbps.mp3", "sdfhsfsdfsd", "Harvindar Singh", "01:04:44", "images/park.png", true);
+        // this.listHandler.add("audio/10 Bande - George Sidhu 128 Kbps.mp3", "sdfhsfsdfsd", "Harvindar Singh", "01:04:44", "images/park.png", true);
 
     }
 
     this.addFile = (fileObject) => {
         
         this.listHandler.add(fileObject.filePath, fileObject.title, fileObject.artist, fileObject.duration, fileObject.coverImage, false);
+
+        if(this.currentSongElement === null){
+            if(this.listHandler.length() > 0){
+                this.listHandler.selectByIndex(0);
+            }
+        }
     }
 
     this.browseFile = (event) => {
@@ -449,7 +455,6 @@ var audioPlayer = function(browseFileButton, timeSlider, playButton, pauseButton
 
     this.onSongChnage = (song_element) => {
         this.cdPlayer.style.backgroundImage = `url(${song_element.image})`;
-
         this.currentSongElement = song_element;
         this.currentSong.src = this.currentSongElement.songFile;
         this.currentSong.load();
@@ -497,6 +502,15 @@ var audioPlayer = function(browseFileButton, timeSlider, playButton, pauseButton
     }
 
     this.playPause = () => {
+        if(this.currentSongElement === null){
+            if(this.listHandler.length() > 0){
+                this.listHandler.selectByIndex(0);
+            }
+            else{
+                alert("There is no song in the library.");
+                return;
+            }
+        }
         if(this.isPlaying){
             this.pause();
         }
