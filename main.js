@@ -321,6 +321,10 @@ var audioPlayer = function(browseFileButton, timeSlider, playButton, pauseButton
     this.volume = 1;
     this.isTimeSliderSliding = false;
 
+    this.isDiskAnimationActive = true;
+    this.diskTranslatePosition = 41;
+    this.isGoingReverse = true;
+
     // settingup time intervals for live updates.
     this.liveUpdateInterval = setInterval(() => {
         if(this.isPlaying){
@@ -331,13 +335,56 @@ var audioPlayer = function(browseFileButton, timeSlider, playButton, pauseButton
             this.songCurrentTime.innerText = `${duration[0]>0 ? duration[0] + ":" : ""}${duration[1]>9 ? duration[1] : "0"+duration[1]}:${duration[2]>9 ? duration[2] : "0"+duration[2]}`;
             // this.songCurrentTime.innerText = `${(this.currentSong.currentTime/60).toFixed(2)}`;
 
-            // code to rotate cd.
-            this.rotate++;
-            if(this.rotate > 360){
-                this.rotate = 0;
+
+            var computedWidth = window.getComputedStyle(document.querySelector("body")).width.slice(0, -2);
+
+            if(!this.isDiskAnimationActive){
+                // code to rotate cd.
+                this.rotate++;
+                if(this.rotate > 360){
+                    this.rotate = 0;
+                }
+                if(computedWidth <= 540){
+    
+                    this.diskTranslatePosition = 41;
+                }
+                else{
+                    this.diskTranslatePosition = 37;
+                }
+                this.cd_disk.style.transform = `translate(${this.diskTranslatePosition}%, 0%) rotate(${this.rotate}deg)`;
             }
-            this.cd_disk.style.transform = `translate(50%, -50%) rotate(${this.rotate}deg)`;
         }
+
+        if(this.isDiskAnimationActive){
+
+            var computedWidth = window.getComputedStyle(document.querySelector("body")).width.slice(0, -2);
+
+            if(this.isGoingReverse){
+                if(this.diskTranslatePosition > -14){
+                    this.diskTranslatePosition -= 2;
+                }
+                else{
+                    this.isGoingReverse = false;
+                }
+            }
+            else{
+                this.diskTranslatePosition += 2;
+                if(computedWidth <= 540){
+                    if(this.diskTranslatePosition >= 41){
+                        this.isDiskAnimationActive = false;
+                        this.isGoingReverse = true;
+                    }
+                }
+                else{
+                    if(this.diskTranslatePosition >= 37){
+                        this.isDiskAnimationActive = false;
+                        this.isGoingReverse = true;
+                    }
+                }
+            }
+            this.cd_disk.style.transform = `translate(${this.diskTranslatePosition}%, 0%) rotate(${this.rotate}deg)`;
+        }
+
     }, 15);
 
     // constructor.
@@ -358,7 +405,9 @@ var audioPlayer = function(browseFileButton, timeSlider, playButton, pauseButton
         this.buttonBrowseFile.addEventListener("change", this.browseFile);
 
         this.timeSlider.addEventListener("mouseup", this.onTimeChnage);
+        this.timeSlider.addEventListener("touchend", this.onTimeChnage);
         this.timeSlider.addEventListener("mousedown", this.onTimeSliderActive);
+        this.timeSlider.addEventListener("touchstart", this.onTimeSliderActive);
 
         // setting upcall back on audio.
         this.currentSong.addEventListener("loadedmetadata", this.onMetaDataLoad);
@@ -454,6 +503,7 @@ var audioPlayer = function(browseFileButton, timeSlider, playButton, pauseButton
     }
 
     this.onSongChnage = (song_element) => {
+        this.isDiskAnimationActive = true;
         this.cdPlayer.style.backgroundImage = `url(${song_element.image})`;
         this.currentSongElement = song_element;
         this.currentSong.src = this.currentSongElement.songFile;

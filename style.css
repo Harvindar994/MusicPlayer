@@ -153,12 +153,12 @@ a {
 }
 
 .cd {
-    width: 80%;
-    height: 80%;
+    width: 250px;
+    height: 250px;
     position: absolute;
-    right: 0;
-    top: 50%;
-    transform: translate(50%, -50%);
+    /* right: 0;
+    top: 50%; */
+    transform: translate(37%, 0%);
     border-radius: 100%;
     display: flex;
     justify-content: center;
@@ -471,6 +471,12 @@ footer {
     .cd-player {
         width: 200px;
         height: 200px;
+    }
+
+    .cd{
+        transform: translate(41%, 0%);
+        width: 150px;
+        height: 150px;
     }
 
     .player-menu-optins:nth-child(1) {
