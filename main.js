@@ -267,7 +267,6 @@ var listHandler = function (lContainer, onLike=null, onDelete=null, onSelect=nul
             var duration = this.convertHMS(audioContext.duration);
             song_element.duration = `${duration[0]>0 ? duration[0] + ":" : ""}${duration[1]>9 ? duration[1] : "0"+duration[1]}:${duration[2]>9 ? duration[2] : "0"+duration[2]}`;
             songDuration.innerText = song_element.duration;
-            console.log(duration);
         });
     }
 
