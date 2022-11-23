@@ -187,6 +187,7 @@ var songElement = function(songFile, songName, artist, duration, image, isLiked,
 
         this.onDelete = (event) => {
             this.element.remove();
+            event.stopPropagation();
             if(this.onDeleteCallback !== null){
                 this.onDeleteCallback(this);
             }
@@ -203,6 +204,7 @@ var songElement = function(songFile, songName, artist, duration, image, isLiked,
                 this.element.querySelector("#likeButton").classList.add("hide");
                 this.isLiked = true;
             }
+            event.stopPropagation();
             if(this.onLikeCallback !== null){
                 this.onLikeCallback(this);
             }
@@ -222,6 +224,32 @@ var listHandler = function (lContainer, onLike=null, onDelete=null, onSelect=nul
     this.onSelectCallback = onSelect;
     this.currentSelection = null;
     this.listElements = [];
+    this.allListElements = [];
+    this.isLikeFilterActive = false;
+
+    this.likeFilterApplyToggel = () => {
+        if(this.isLikeFilterActive){
+            this.listElements = this.allListElements;
+            for(let index=0; index<this.listElements.length; index++){
+                this.listElements[index].element.classList.remove("hide");
+            }
+            this.isLikeFilterActive = false;
+        }
+        else{
+            var likedSong = [];
+            for(let index=0; index<this.listElements.length; index++){
+                if(this.listElements[index].isLiked){
+                    likedSong.push(this.listElements[index]);
+                }
+                else{
+                    this.listElements[index].element.classList.add("hide");
+                }
+            }
+            this.allListElements = this.listElements;
+            this.listElements = likedSong;
+            this.isLikeFilterActive = true;
+        }
+    }
 
     this.add = function(songFile, songName, artist, duration, image, isLiked=false){
         var element = new songElement(songFile, songName, artist, duration, image, isLiked, this.onLike, this.onDelete, this.onSelect);
@@ -230,18 +258,23 @@ var listHandler = function (lContainer, onLike=null, onDelete=null, onSelect=nul
     }
 
     this.onDelete = (song_element) => {
+        if(this.onDeleteCallback !== null){
+            this.onDeleteCallback(song_element);
+        }
         let index = this.listElements.indexOf(song_element);
         if(index > -1){
             this.listElements.splice(index, 1);
-        }
-        if(this.onDeleteCallback !== null){
-            this.onDeleteCallback(song_element);
         }
     }
 
     this.onLike = (song_element) => {
         if(this.onLikeCallback !== null){
             this.onLikeCallback(song_element);
+        }
+        if(this.isLikeFilterActive){
+            let index = this.listElements.indexOf(song_element);
+            this.listElements.splice(index, 1);
+            song_element.element.classList.add("hide");
         }
     }
 
@@ -305,6 +338,7 @@ var audioPlayer = function(browseFileButton, timeSlider, playButton, pauseButton
     this.songDuration = duration;
     this.cd_disk = document.querySelector(".cd");
     this.cdPlayer = document.querySelector(".cd-player");
+    this.buttonLikeFilter = document.querySelector("#like-filter");
     this.rotate = 0;
 
     // audio related objects.
@@ -318,6 +352,7 @@ var audioPlayer = function(browseFileButton, timeSlider, playButton, pauseButton
     this.isPlaying = false;
     this.isRepeatActive = false;
     this.isShuffleActive = false;
+    this.isLikeFilterActive = false;
     this.volume = 1;
     this.isTimeSliderSliding = false;
 
@@ -390,7 +425,7 @@ var audioPlayer = function(browseFileButton, timeSlider, playButton, pauseButton
     // constructor.
     this.__init__ = function(){
         // created and object of list handler.
-        this.listHandler = new listHandler(listContainer, null, this.onDelete, this.onSongChnage);
+        this.listHandler = new listHandler(listContainer, this.onLike, this.onDelete, this.onSongChnage);
 
         // created an object of volume controller.
         this.volumeController = new volumeController(volumeIcons, volumeSlider, this.onVolumeChnage);
@@ -403,6 +438,7 @@ var audioPlayer = function(browseFileButton, timeSlider, playButton, pauseButton
         this.repeatButton.addEventListener("click", this.onRepeatChnage);
         this.shuffleButton.addEventListener("click", this.onShuffleActive);
         this.buttonBrowseFile.addEventListener("change", this.browseFile);
+        this.buttonLikeFilter.addEventListener("click", this.onLikeFilterApply);
 
         this.timeSlider.addEventListener("mouseup", this.onTimeChnage);
         this.timeSlider.addEventListener("touchend", this.onTimeChnage);
@@ -420,6 +456,37 @@ var audioPlayer = function(browseFileButton, timeSlider, playButton, pauseButton
         // this.listHandler.add("audio/18 Saal - Deep Dosanjh 128 Kbps.mp3", "sdfhsfsdfsd", "Harvindar Singh", "01:04:44", "images/park.png", true);
         // this.listHandler.add("audio/10 Bande - George Sidhu 128 Kbps.mp3", "sdfhsfsdfsd", "Harvindar Singh", "01:04:44", "images/park.png", true);
 
+    }
+
+    this.onLikeFilterApply = (event) => {
+        if(this.isLikeFilterActive){
+            this.isLikeFilterActive = false;
+            document.querySelector("#like-filter").classList.remove("filter-active");
+        }
+        else{
+            this.isLikeFilterActive = true;
+            document.querySelector("#like-filter").classList.add("filter-active");
+        }
+        this.listHandler.likeFilterApplyToggel();
+        if(!this.currentSongElement.isLiked){
+            this.listHandler.selectByIndex(0);
+        }
+    }
+
+    this.onLike = (song_element) => {
+        if(this.isLikeFilterActive){
+            if(song_element === this.currentSongElement){
+                if(!song_element.isLiked){
+                    let currentIndex = this.listHandler.indexOf(this.currentSongElement);
+                    if(currentIndex < (this.listHandler.length()-1)){
+                        this.listHandler.selectByIndex(currentIndex+1);
+                    }
+                    else{
+                        this.listHandler.selectByIndex(0);
+                    }
+                }
+            }
+        }
     }
 
     this.addFile = (fileObject) => {
@@ -499,11 +566,21 @@ var audioPlayer = function(browseFileButton, timeSlider, playButton, pauseButton
     }
 
     this.onDelete = (song_element) => {
-        console.log("on delete song");
+        if(song_element === this.currentSongElement){
+            let currentIndex = this.listHandler.indexOf(this.currentSongElement);
+            if(currentIndex < (this.listHandler.length()-1)){
+                this.listHandler.selectByIndex(currentIndex+1);
+            }
+            else{
+                this.listHandler.selectByIndex(0);
+            }
+        }
     }
 
     this.onSongChnage = (song_element) => {
-        this.isDiskAnimationActive = true;
+        if(song_element !== this.currentSongElement){
+            this.isDiskAnimationActive = true;
+        }
         this.cdPlayer.style.backgroundImage = `url(${song_element.image})`;
         this.currentSongElement = song_element;
         this.currentSong.src = this.currentSongElement.songFile;
@@ -518,7 +595,16 @@ var audioPlayer = function(browseFileButton, timeSlider, playButton, pauseButton
         let length = this.listHandler.length();
         let currentIndex = this.listHandler.indexOf(this.currentSongElement);
         if(currentIndex < (length-1)){
-            this.listHandler.selectByIndex(currentIndex+1);
+            if(this.isShuffleActive){
+                var shuffleIndex = getRandomInt(0, length-1);
+                if(shuffleIndex == currentIndex){
+                    shuffleIndex ++;
+                }
+                this.listHandler.selectByIndex(shuffleIndex);
+            }
+            else{
+                this.listHandler.selectByIndex(currentIndex+1);
+            }
         }
         else{
             if(this.isRepeatActive){

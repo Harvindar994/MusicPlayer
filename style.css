@@ -207,6 +207,11 @@ a {
     color: var(--primary-2);
 }
 
+.filter-active{
+    background-color: var(--primary-2);
+    color: white;
+}
+
 .player-menu-optins .inactive{
 
 }
@@ -230,9 +235,17 @@ a {
     justify-content: center;
 }
 
+.status-bar .slider p{
+    min-width: 71px;
+}
+.status-bar .slider p:nth-child(3){
+    text-align: right;
+}
+
+
 .status-bar .slider .time-slider{
     flex: 1;
-    margin: 1rem 1rem;
+    margin: 1rem 0rem;
 }
 
 .controls{
@@ -345,10 +358,19 @@ a {
     border-radius: 100%;
 }
 
+.song-buttons a:hover{
+    border: 2px solid var(--primary-2);
+    color: var(--primary-2);
+}
+
 .liked{
     background-color: #ff226af2;
     color: white;
     border: 2px solid #ff226af2 !important;
+}
+
+.liked:hover{
+    color: var(--dark) !important;
 }
 
 /* background drop style */
