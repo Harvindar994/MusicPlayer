@@ -299,7 +299,9 @@ var listHandler = function (lContainer, onLike=null, onDelete=null, onSelect=nul
             if(this.onSelectCallback !== null){
                 this.onSelectCallback(this.currentSelection);
             }
+            return true;
         }
+        return false;
     }
 
     this.indexOf = function(song_element){
@@ -458,18 +460,32 @@ var audioPlayer = function(browseFileButton, timeSlider, playButton, pauseButton
 
     }
 
+    this.setPlayerToDefault = () => {
+        this.cdPlayer.style.backgroundImage = "url(images/bg2.jpg)";
+        this.currentSongElement = null;
+        this.stop();
+        this.currentSong.src = "";
+        this.songCurrentTime.innerText = "00:00";
+        this.songDuration.innerText = "00:00";
+    }
+
     this.onLikeFilterApply = (event) => {
+        this.listHandler.likeFilterApplyToggel();
         if(this.isLikeFilterActive){
             this.isLikeFilterActive = false;
             document.querySelector("#like-filter").classList.remove("filter-active");
+            if(this.currentSongElement === null){
+                this.listHandler.selectByIndex(0);
+            }
         }
         else{
             this.isLikeFilterActive = true;
             document.querySelector("#like-filter").classList.add("filter-active");
         }
-        this.listHandler.likeFilterApplyToggel();
         if(!this.currentSongElement.isLiked){
-            this.listHandler.selectByIndex(0);
+            if(!this.listHandler.selectByIndex(0)){
+                this.setPlayerToDefault();
+            }
         }
     }
 
@@ -643,7 +659,12 @@ var audioPlayer = function(browseFileButton, timeSlider, playButton, pauseButton
                 this.listHandler.selectByIndex(0);
             }
             else{
-                alert("There is no song in the library.");
+                if(this.isLikeFilterActive){
+                    alert("There is no song in the favorite list.");
+                }
+                else{
+                    alert("There is no song in the library.");
+                }
                 return;
             }
         }
