@@ -1,6 +1,27 @@
 var jsmediatags = window.jsmediatags;
 var drops_container = document.querySelector(".drops");
 
+
+// Code to maintain the height of the scroll area that contain list of song.
+var songListElement = document.querySelector(".play");
+var listContainer = document.querySelector(".list-container");
+
+let resizeObserver = new ResizeObserver(() => {
+    var computedWidth = window.getComputedStyle(document.querySelector("body")).width.slice(0, -2);
+    if(computedWidth > 1305){
+        // let height = parseInt(window.getComputedStyle(songListElement).height.slice(0, -2)) - 64;
+        // console.log(`${height}px`);
+        listContainer.style.maxHeight = `${0}px`;
+        setTimeout(()=>{
+            let height = parseInt(window.getComputedStyle(songListElement).height.slice(0, -2)) - 64;
+            console.log(`${height}px`);
+            listContainer.style.maxHeight = `${height}px`;
+        }, 0);
+    }
+});
+
+resizeObserver.observe(songListElement);
+
 function getRandomInt(start, end) {
     variation = end - start
     return start + Math.floor(Math.random() * variation);
